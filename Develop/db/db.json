@@ -1,6 +1,7 @@
 [
     {
-        "title":"Test Title",
-        "text":"Test text"
-    }
+        "title": "Title Example",
+        "text": "Hey there!",
+        "tip_id": "701e"
+    },
 ]
