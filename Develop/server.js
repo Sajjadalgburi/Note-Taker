@@ -19,12 +19,17 @@ app.get("/notes", (req, res) => {
   res.sendFile(path.join(__dirname, "public/notes.html"));
 });
 
-// Define catch-all route to return homepage.html
-app.get("*", (req, res) => {
+// Define main root route for return homepage.html
+app.get("/", (req, res) => {
   console.info(`${req.method} request received for homepage`);
 
   res.sendFile(path.join(__dirname, "public/homepage.html"));
 });
+
+// Wildcard route to direct users to a 404 page
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "./public/404.html"))
+);
 
 // calling the server through listen method
 app.listen(PORT, () =>
