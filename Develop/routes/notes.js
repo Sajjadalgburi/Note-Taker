@@ -1,3 +1,4 @@
+const path = require("path");
 const notes = require("express").Router();
 const uuid = require("../helpers/uuid");
 
@@ -8,9 +9,12 @@ const {
   readAndAppend,
 } = require("../helpers/fsUtils");
 
+// Define the path to db.json
+const dbFilePath = path.join(__dirname, "../db/db.json");
+
 notes.get("/", (req, res) => {
   console.info(`${req.method} request received for notes`);
-  readFromFile("./db/db.json").then((data) => res.json(JSON.parse(data)));
+  readFromFile(dbFilePath).then((data) => res.json(JSON.parse(data)));
 });
 
 notes.post("/", (req, res) => {
@@ -22,14 +26,44 @@ notes.post("/", (req, res) => {
     const newNote = {
       title,
       text,
-      tip_id: uuid(),
+      id: uuid(),
     };
 
-    readAndAppend(newNote, "./db/db.json");
-    res.json(`Tip added successfully 🚀`);
+    readAndAppend(newNote, dbFilePath);
+    res.json(`Note added successfully 🚀`);
   } else {
-    res.error("Error in adding tip");
+    res.error("Error in adding note");
   }
+});
+
+// GET Route for a specific tip
+notes.get("/:tip_id", (req, res) => {
+  const id = req.params.note_id;
+  readFromFile(dbFilePath)
+    .then((data) => JSON.parse(data))
+    .then((json) => {
+      const result = json.filter((note) => note.note_id !== id);
+      return result.length > 0
+        ? res.json(result)
+        : res.json("No tip with that ID");
+    });
+});
+
+notes.delete("/:note_id", (req, res) => {
+  const id = req.params.note_id;
+
+  readFromFile(dbFilePath)
+    .then((data) => JSON.parse(data))
+    .then((json) => {
+      // Make a new array of all notes except the one with the ID provided in the URL
+      const result = json.filter((note) => note.note_id !== id);
+
+      // Save that array to the filesystem
+      writeToFile(dbFilePath, JSON.stringify(result)); // Stringify the JSON before writing to file
+
+      // Respond to the DELETE request
+      res.json(`Item ${id} has been deleted 🗑️`);
+    });
 });
 
 module.exports = notes;
