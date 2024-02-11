@@ -37,7 +37,7 @@ notes.post("/", (req, res) => {
 });
 
 // GET Route for a specific tip
-notes.get("/:tip_id", (req, res) => {
+notes.get("/:note_id", (req, res) => {
   const id = req.params.note_id;
   readFromFile(dbFilePath)
     .then((data) => JSON.parse(data))
@@ -56,10 +56,10 @@ notes.delete("/:note_id", (req, res) => {
     .then((data) => JSON.parse(data))
     .then((json) => {
       // Make a new array of all notes except the one with the ID provided in the URL
-      const result = json.filter((note) => note.note_id !== id);
+      const result = json.filter((note) => note.id !== id);
 
       // Save that array to the filesystem
-      writeToFile(dbFilePath, JSON.stringify(result)); // Stringify the JSON before writing to file
+      writeToFile(dbFilePath, result); // Stringify the JSON before writing to file
 
       // Respond to the DELETE request
       res.json(`Item ${id} has been deleted 🗑️`);
